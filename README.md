@@ -1,6 +1,6 @@
 # WezTerm config
 
-Make sure to clone this repo into `~/.config`
+Make sure to clone this repo into `~/.config/wezterm`
 
 That should set the `init.lua` file location to `~/.config/wezterm/init.lua`
 
