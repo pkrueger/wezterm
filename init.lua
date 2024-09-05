@@ -3,6 +3,7 @@
 --------------------------------------------
 
 local wezterm = require("wezterm")
+local l = require("layouts")
 
 local config = {}
 
@@ -214,6 +215,15 @@ config.keys = {
 		mods = "LEADER",
 		action = wezterm.action.ActivateCopyMode,
 	},
+
+	-- Custom layout configuration
+	{
+		key = "L",
+		mods = "LEADER",
+		action = wezterm.action_callback(function(window, pane)
+			l.show_layout_picker(window)
+		end),
+	},
 }
 
 -- Smart Splits Config for Neovim Support --
@@ -243,5 +253,36 @@ config.hyperlink_rules = wezterm.default_hyperlink_rules()
 -- })
 
 config.scrollback_lines = 10000
+
+wezterm.on("user-var-changed", function(window, pane, name, value)
+	if name == "INIT_WORKSPACE" then
+		local layout_name = value
+		local layout_file = wezterm.config_dir .. "/.config/wezterm/layouts/" .. layout_name .. ".lua"
+
+		-- Load the layout file
+		local layout = dofile(layout_file)
+		if not layout.base_dir then
+			return
+		end
+
+		for _, tab in ipairs(layout) do
+			window:perform_action(act.SpawnTab("CurrentPaneDomain"), pane)
+
+			wezterm.log_info("Creating tab: " .. tab.name)
+			local tab_obj = window:active_tab()
+			tab_obj:set_title(tab.name)
+
+			if not tab.splits then
+				window:active_pane():send_text("cd " .. (tab.cwd or layout.base_dir) .. "\n")
+			end
+
+			if tab.splits then
+				l.create_splits(window, tab_obj:active_pane(), tab.splits, layout.base_dir)
+			elseif tab.command then
+				window:active_pane():send_text(tab.command .. "\n")
+			end
+		end
+	end
+end)
 
 return config
