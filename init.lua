@@ -11,6 +11,8 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
+config.enable_wayland = true
+
 local act = wezterm.action
 
 wezterm.on("update-right-status", function(window, pane)
@@ -55,7 +57,7 @@ end)
 config.font = wezterm.font("FiraCode Nerd Font Mono")
 
 -- Optional: Set font size
-config.font_size = 15.0
+config.font_size = 13.0
 config.line_height = 1.2
 
 -- Cursor style
@@ -77,7 +79,7 @@ config.window_padding = {
 }
 
 -- Window decorations
-config.window_decorations = "RESIZE"
+config.window_decorations = "NONE"
 
 -- Background opacity
 config.window_background_opacity = 1.0
