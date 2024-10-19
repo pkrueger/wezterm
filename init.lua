@@ -31,6 +31,7 @@ function scheme_for_appearance(appearance)
 	if appearance:find("Dark") then
 		return dark_theme.colors(), dark_theme.window_frame()
 	else
+		-- return dark_theme.colors(), dark_theme.window_frame()
 		return light_theme.colors(), light_theme.window_frame()
 	end
 end
@@ -54,7 +55,12 @@ end)
 --------------------------------------------
 
 -- Optional: Set a default font
-config.font = wezterm.font("FiraCode Nerd Font Mono")
+config.font = wezterm.font_with_fallback({
+	"FiraCode Nerd Font Mono",
+	"Font Awesome 6 Free Solid",
+	"Font Awesome 6 Free Regular",
+	"Font Awesome 6 Brands Regular",
+})
 
 -- Optional: Set font size
 config.font_size = 13.0
@@ -146,7 +152,7 @@ config.keys = {
 	-- { key = "s", mods = "LEADER", action = act.ShowTabNavigator },
 
 	-- Pane management
-	{ key = '"', mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = ";", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "'", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 	{ key = "w", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
 	{
