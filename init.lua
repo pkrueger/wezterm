@@ -106,7 +106,7 @@ config.inactive_pane_hsb = {
 local function toggle_opacity(window)
 	local overrides = window:get_config_overrides() or {}
 	if not overrides.window_background_opacity then
-		overrides.window_background_opacity = 0.85
+		overrides.window_background_opacity = 0.75
 	else
 		overrides.window_background_opacity = nil
 	end
@@ -243,7 +243,7 @@ smart_splits.apply_to_config(config, {
 	-- modifier keys to combine with direction_keys
 	modifiers = {
 		move = "CTRL", -- modifier to use for pane movement, e.g. CTRL+h to move left
-		resize = "CMD|META", -- modifier to use for pane resize, e.g. META+h to resize to the left
+		resize = "CTRL|META", -- modifier to use for pane resize, e.g. META+h to resize to the left
 	},
 })
 
