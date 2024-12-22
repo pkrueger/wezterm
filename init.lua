@@ -23,20 +23,25 @@ end)
 --------------- COLOR SCHEME ---------------
 --------------------------------------------
 
-light_theme = wezterm.plugin.require("https://github.com/neapsix/wezterm").dawn
-dark_theme = wezterm.plugin.require("https://github.com/neapsix/wezterm").moon
+LIGHT_THEME = wezterm.plugin.require("https://github.com/neapsix/wezterm").dawn
+DARK_THEME = wezterm.plugin.require("https://github.com/neapsix/wezterm").moon
 
 -- Set the color scheme based on system appearance
-function scheme_for_appearance(appearance)
-	if appearance:find("Dark") then
-		return dark_theme.colors(), dark_theme.window_frame()
-	else
-		-- return dark_theme.colors(), dark_theme.window_frame()
-		return light_theme.colors(), light_theme.window_frame()
+local function scheme_for_appearance()
+	local handle = io.open(os.getenv("HOME") .. "/.config/wezterm/current-theme", "r")
+	if handle then
+		local result = handle:read("*a")
+		handle:close()
+
+		if result:find("dark") then
+			return DARK_THEME.colors(), DARK_THEME.window_frame()
+		else
+			return LIGHT_THEME.colors(), LIGHT_THEME.window_frame()
+		end
 	end
 end
 
-local colors, window_frame = scheme_for_appearance(wezterm.gui.get_appearance())
+local colors, window_frame = scheme_for_appearance()
 
 config.colors = colors
 config.window_frame = window_frame
@@ -44,7 +49,7 @@ config.window_frame = window_frame
 -- Automatically reload configuration when system appearance changes
 wezterm.on("window-config-reloaded", function(window, pane)
 	local overrides = window:get_config_overrides() or {}
-	local override_color, override_window_frame = scheme_for_appearance(wezterm.gui.get_appearance())
+	local override_color, override_window_frame = scheme_for_appearance()
 	overrides.colors = override_color
 	overrides.window_frame = override_window_frame
 	window:set_config_overrides(overrides)
@@ -75,7 +80,7 @@ config.default_cursor_style = "SteadyBlock"
 
 -- Optional: Enable the tab bar
 config.enable_tab_bar = true
-config.use_fancy_tab_bar = true
+config.use_fancy_tab_bar = false
 
 config.window_padding = {
 	left = 5,
@@ -232,6 +237,9 @@ config.keys = {
 			l.show_layout_picker(window)
 		end),
 	},
+
+	-- unbind ctrl d that closes a tab with no confirm
+	{ key = "d", mods = "CTRL", action = "Nop" },
 }
 
 -- Smart Splits Config for Neovim Support --
@@ -290,6 +298,17 @@ wezterm.on("user-var-changed", function(window, pane, name, value)
 				window:active_pane():send_text(tab.command .. "\n")
 			end
 		end
+	end
+	if name == "THEME_CHANGE" then
+		local overrides = window:get_config_overrides() or {}
+		if value:find("dark") then
+			overrides.colors = DARK_THEME.colors()
+			overrides.window_frame = DARK_THEME.window_frame()
+		else
+			overrides.colors = LIGHT_THEME.colors()
+			overrides.window_frame = LIGHT_THEME.window_frame()
+		end
+		window:set_config_overrides(overrides)
 	end
 end)
 
